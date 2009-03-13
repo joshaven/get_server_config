@@ -1,0 +1,4 @@
+chmod +x /etc/get_server_config/bin/*
+mkdir -p /usr/local/bin
+ln -s /etc/get_server_config/bin/get /usr/local/bin/get
+echo "Ensure that /usr/local/bin is in your path"
