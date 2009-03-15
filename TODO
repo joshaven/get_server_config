@@ -1,0 +1,16 @@
+Ideas:
+  New app: "modify" > config file tracker.
+  From the console type `modify /etc/postfix/postfix.conf` to backup and edit using the system configured editor.
+  Backs up changes using tar.gz repo or git repo
+  An alternative would be something that automatically watches configs
+  
+Feature:
+  `get --initialize` > to add all currently installed packages to 'tracked' apps.  This is to make your server more portable...
+  `get --install` or implied by get not being installed > to build /etc/get_server_config structure & support file... 
+    this would make the installation of the app only require running the single file script.
+  `get search`... probably turn returns into a numbered list showing results '1'-1'0' and 'n' for next page.
+  
+Maintenance:
+  ensure script is modular enough that it is easy to support other options namely: yum, python:easy_install, python:pip
+  
+  
