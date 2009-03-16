@@ -66,9 +66,9 @@ function display_help {
   echo "Any .deb packages locate in /etc/server_config/deb will take precedence over"
   echo "any apt repositories.  Be sure to use the following naming convention:"
   echo "package_name-version.deb for any applications in the local repo."
-  echo "  Hint: .deb can be built with dh-make or other tools."
+  echo "Report any bugs to yourtech@gmail.com"
+  echo "If you have found this script useful please paypal my email address a buck or two!"
   echo "                                    -- Joshaven Potter <yourtech@gmail.com>"
-  echo "If you have found this script useful please paypal me (yourtech@gmail.com) a buck or two!"
 }
 
 function purge_package {
@@ -152,7 +152,7 @@ function get_self_installer {
   # Set script as executable and symlink to a good location
   chmod +x /etc/get_server_config/bin/*
   mkdir -p /usr/local/bin
-  ln -s /etc/get_server_config/bin/get /usr/local/bin/get
+  ln -sf /etc/get_server_config/bin/get /usr/local/bin/get
   # Test install
   if [ -e '/usr/local/bin/get' ]
     then echo "> 'get' was installed successfully"
@@ -163,6 +163,7 @@ function get_self_installer {
   then echo "> 'get' is avilable in roots path."
   else echo -e "> It appears that '/usr/local/bin' is not part of your path.\n*** Please add '/usr/local/bin' root's path ***"
   fi
+  echo "Enjoy your (get)ting"
 }
 
 
