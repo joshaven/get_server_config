@@ -155,12 +155,13 @@ function get_self_installer {
   ln -s /etc/get_server_config/bin/get /usr/local/bin/get
   # Test install
   if [ -e '/usr/local/bin/get' ]
-    then echo "'get' was installed successfully"
+    then echo "> 'get' was installed successfully"
   fi
   # Test path
-  if [[ $PATH =~ "(:/usr/local/bin:)" ]]
-  then echo "'get' is avilable in roots path."
-  else echo -e "It appears that '/usr/local/bin' is not part of your path.\n*** Please add '/usr/local/bin' root's path ***"
+  
+  if [[ $PATH =~ (^|:)/usr/local/bin($|:) ]]
+  then echo "> 'get' is avilable in roots path."
+  else echo -e "> It appears that '/usr/local/bin' is not part of your path.\n*** Please add '/usr/local/bin' root's path ***"
   fi
 }
 
