@@ -1,38 +1,16 @@
-# This only currently supports linux distros that use the APT package manager: ie debian, ubuntu & friends
+== Current Status
+This script only currently supports linux distros that use the APT package manager: ie debian, ubuntu & friends
 
-# This application is incomplete!  The script does not manage gems nor remove .deb or gem packages from the lists
-# This script is fully functional for adding .deb packages.
+This application is incomplete!  The script does not manage gems nor remove .deb or gem packages from the lists
+This script is fully functional for adding .deb packages.
 
-# sample useage (working feature):    get ruby    
-# The above adds ruby to the /etc/get_server_config/deb.list file and installs using your configure apt servers
+sample useage (working feature):    `sudo get ruby`
+The above adds ruby to the /etc/get_server_config/deb.list file and installs using your configure apt servers
 
 
-For help on using 'install' please type 'install --help' at the command prompt.
+== Overview
 
-The remainder of this file is about building debian packages.  Please use the installation manager, 'install', to install the packages listed below and once your custom .deb packages are built, please use the installation manager to install these packages.
 
-Here is but one option:
-=======================
-
-Here's how to easily build a .deb package for ubuntu (or debian). You could build a .deb package using checkinstall, but that wouldn't include all the debian/ubuntu specifics you need. I used the following to build the ubuntu package for my next release of News notification.
-
-First off, let's install the necessary tools:
-# apt-get install autotools-dev fakeroot dh-make build-essential
-
-Then copy your source tree into a directory in /tmp:
-# cp -r news-notification-0.3 /tmp
-# cd /tmp/news-notification-0.3
-
-Now let's make the debian control files:
-# dh_make
-and pick Single for single binary, or whatever is appropriate for your project.
-
-Edit the debian/control file and at least change the Maintainer and Description fields. There are a few other files you will probably want to edit.
-
-Then run the following: (this has to be done as root)
-# dpkg-buildpackage -rfakeroot
-
-Looking at the debian/news-notification/DEBIAN/control file we can see that all the dependencies are proper thanks to the autoconf system. If we look in /tmp (one directory up) we see news-notification_0.3-1_i386.deb which is ready to go! If we want to use the appropriate ubuntu package versioning, check out this post. Since this is my first ubuntu package of this version, with no debian original it would be:
-news-notification_0.3-0ubuntu1_i386.deb
-
-source: http://www.quietearth.us/articles/2006/08/16/Building-deb-package-from-source
+== Quick Start
+To install get download the script and they type `sudo bash ./get_installer.sh --self_install` see INSTALL for details
+For help on using 'get' please type 'get --help' at the command prompt.

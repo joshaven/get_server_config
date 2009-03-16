@@ -1,4 +1,12 @@
-chmod +x /etc/get_server_config/bin/*
-mkdir -p /usr/local/bin
-ln -s /etc/get_server_config/bin/get /usr/local/bin/get
-echo "Ensure that /usr/local/bin is in your path"
+Run 'sudo ./get_installer.sh --self_install'
+If your copying this script from a working server run 'sudo ./get --self_install'
+
+
+If you appreciate the work I put into this please paypal me (yourtech@gmail.com) a buck or two...
+
+This command will create the directory structure required and symlink the 'get' script into /usr/local/bin
+It will also confirm that 'get' is in your path
+
+Read the README for an explanation of this script or be lazy and just run 'get --help'
+
+No other files are needed for the operation of 'get'

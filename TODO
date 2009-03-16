@@ -6,8 +6,6 @@ Ideas:
   
 Feature:
   `get --initialize` > to add all currently installed packages to 'tracked' apps.  This is to make your server more portable...
-  `get --install` or implied by get not being installed > to build /etc/get_server_config structure & support file... 
-    this would make the installation of the app only require running the single file script.
   `get search`... probably turn returns into a numbered list showing results '1'-1'0' and 'n' for next page.
   
 Maintenance:
