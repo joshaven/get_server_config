@@ -58,16 +58,17 @@ function display_help {
   echo "  get --rebuild"
   echo
   echo "Options:"
-  echo "  --purge [package_name] This will uninstall package and purge config"
-  echo "  --rebuild              Use this option to install any missing applications"
-  echo 
+  echo "  --purge [package_name]  This will uninstall package and purge config"
+  echo "  --rebuild               Use this option to install any missing applications"
+  echo "  --self_install               This will install get to your system"
+  echo
   echo
   echo "Any .deb packages locate in /etc/server_config/deb will take precedence over"
   echo "any apt repositories.  Be sure to use the following naming convention:"
   echo "package_name-version.deb for any applications in the local repo."
   echo "  Hint: .deb can be built with dh-make or other tools."
   echo "                                    -- Joshaven Potter <yourtech@gmail.com>"
-  echo
+  echo "If you have found this script useful please paypal me (yourtech@gmail.com) a buck or two!"
 }
 
 function purge_package {
@@ -80,8 +81,8 @@ function purge_package {
   done
 }
 
-function append_deb_install_list { 
-  packages=($@) 
+function append_deb_install_list {
+  packages=($@)
   #array of packages
   for (( i=0; i<=$[${#packages[@]}-1]; i++ )); do
     if ls /etc/server_config/deb/|grep "^${packages[$i]}-[0-9].*.deb$";then
@@ -100,7 +101,7 @@ function append_deb_install_list {
       return 1
     fi
   done
-}
+} 
 
 function append_gem_install_list {
   packages=($@) #array of packages
@@ -144,6 +145,26 @@ function check_validity {
   done
 }
 
+function get_self_installer {
+  # Ensure path exists and copy this script to the installation folder
+  mkdir -p /etc/get_server_config/bin/
+  cp -f $0 /etc/get_server_config/bin/get
+  # Set script as executable and symlink to a good location
+  chmod +x /etc/get_server_config/bin/*
+  mkdir -p /usr/local/bin
+  ln -s /etc/get_server_config/bin/get /usr/local/bin/get
+  # Test install
+  if [ -e '/usr/local/bin/get' ]
+    then echo "'get' was installed successfully"
+  fi
+  # Test path
+  if [[ $PATH =~ "(:/usr/local/bin:)" ]]
+  then echo "'get' is avilable in roots path."
+  else echo -e "It appears that '/usr/local/bin' is not part of your path.\n*** Please add '/usr/local/bin' root's path ***"
+  fi
+}
+
+
 
 # It may be nice to import .deb packages or build_from source as options from get so that populating the ./deb does not
 # have to be manual 
@@ -167,6 +188,9 @@ if [ `whoami` == 'root' ]; then
       append_gem_install_list $@
     fi
     ;;
+  '--self_install')
+    get_self_installer $0
+    ;;
   *)
     if append_deb_install_list $@; then
       install $@
@@ -176,4 +200,3 @@ if [ `whoami` == 'root' ]; then
 else
   echo "this command requires root access please run 'sudo get package_name'"
 fi
-
