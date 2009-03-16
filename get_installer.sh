@@ -1,4 +1,5 @@
 #! /bin/bash
+
 function init_install_list {
   if [ ! -e /etc/server_config/deb.list ];then
       mkdir -p /etc/server_config/deb
@@ -49,7 +50,6 @@ function install_from_local {
 }
 
 function display_help {
-  echo
   echo "Usage: get [package] "
   echo "Install applications using apt package manager."
   echo "Examples:"
@@ -61,7 +61,7 @@ function display_help {
   echo "  --purge [package_name]  This will uninstall package and purge config"
   echo "  --rebuild               Use this option to install any missing applications"
   echo "  --self_install               This will install get to your system"
-  echo
+  echo "  --version               Display version info."
   echo
   echo "Any .deb packages locate in /etc/server_config/deb will take precedence over"
   echo "any apt repositories.  Be sure to use the following naming convention:"
@@ -174,7 +174,10 @@ function get_self_installer {
 if [ `whoami` == 'root' ]; then
   init_install_list
   case $@ in
-  '' | '--help')
+  '--version')
+    echo "get 0.0.1 (http://github.com/joshaven/get_server_config)"
+    ;;
+  '^$' | '--help$')
     display_help
     ;;
   '--purge*')
