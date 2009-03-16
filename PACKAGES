@@ -1,0 +1,7 @@
+This file is my notes about building debian packages.  Please use the installation manager, 'get', to
+install packages once you have built them and copied them to /etc/get_server_config/deb/
+
+Some options for building .deb packages are: 
+- checkinstall http://lmgtfy.com/?q=checkinstall
+- dh-make http://lmgtfy.com/?q=dh_make
+
