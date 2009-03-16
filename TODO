@@ -1,14 +1,25 @@
+Improvements:
+  - Move to storage of packages to some type of abstracted storage system 
+    (through abstraction function & better file schema) instead of multiple files.
+  - Add migration of data when running --self_install
+  - `get --initialize` > to add all currently installed packages to 'tracked' apps.  This is to make your server more portable...
+  - Add commenting to installs (to track purpose etc)
+    - support default comment as prior comment (in case multiple apps are installed under the same project... like 'setup mail')
+  - Add date/times to installed apps
+  - Add user for install
+  - Force installs to be ran by a non-root user & use sudo internally when needed
+  - Support other options namely: yum, python:easy_install, python:pip
+  - Support search (ie: `get search ruby`)
+    - Interactive options:
+      1) ruby - An interpreter of object-oriented scripting language Ruby
+      2) ruby-dev - Header files for compiling extension modules for Ruby
+      3) ruby-elisp - Emacs-lisp ruby-mode for Ruby
+      4) ruby-full - Ruby full installation
+      ... through 0
+      (C)anccel - (P)revious page - (N)ext page
+      
 Ideas:
-  New app: "modify" > config file tracker.
+  New app: "modify" or "mod" > config file tracker.
   From the console type `modify /etc/postfix/postfix.conf` to backup and edit using the system configured editor.
   Backs up changes using tar.gz repo or git repo
   An alternative would be something that automatically watches configs
-  
-Feature:
-  `get --initialize` > to add all currently installed packages to 'tracked' apps.  This is to make your server more portable...
-  `get search`... probably turn returns into a numbered list showing results '1'-1'0' and 'n' for next page.
-  
-Maintenance:
-  ensure script is modular enough that it is easy to support other options namely: yum, python:easy_install, python:pip
-  
-  

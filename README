@@ -1,16 +1,28 @@
 == Current Status
-This script only currently supports linux distros that use the APT package manager: ie debian, ubuntu & friends
+This script only currently supports linux distros that use the APT package manager. (Debian, Ubuntu & friends)
 
-This application is incomplete!  The script does not manage gems nor remove .deb or gem packages from the lists
-This script is fully functional for adding .deb packages.
-
-sample useage (working feature):    `sudo get ruby`
-The above adds ruby to the /etc/get_server_config/deb.list file and installs using your configure apt servers
+This application is incomplete in features but safe to use.  Keep watching my github... I am making regular improvements.
+Major current limitations: 
+  script does not manage gems nor remove .deb or gem packages from the lists
+Minor limitations
+  see the TODO file
 
 
 == Overview
+This script is meant to function at a very low level.  I am purposing kept the requirements a minimum yet provide a consistent
+way to track & maintain package.
 
 
 == Quick Start
 To install get download the script and they type `sudo bash ./get_installer.sh --self_install` see INSTALL for details
 For help on using 'get' please type 'get --help' at the command prompt.
+As an example, to add the ruby package to your system you would issue this command:
+`sudo get ruby`
+Which would add 'ruby' to the /etc/get_server_config/deb.list file and install ruby from your servers apt repo
+
+
+== Dependancies
+* bash
+* sudo
+* dpkg
+* apt
