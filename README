@@ -2,7 +2,7 @@
 This script only currently supports linux distros that use the APT package manager. (Debian, Ubuntu & friends)
 
 This application is incomplete in features but safe to use and still helpful.
-Keep watching my github... I am making regular improvements. Any upgrades version will remain compatible.
+Keep watching my github... I am making regular improvements. Any updates will remain compatible with all versions.
 
 Major current limitations: 
   script does not manage gems nor remove .deb or gem packages from the lists
@@ -11,8 +11,13 @@ Minor limitations:
 
 
 == Overview
-This script is meant to function at a very low level.  I am purposing kept the requirements a minimum yet provide 
-a consistent way to track & maintain package.
+I am purposing kept the requirements to a minimum yet provide a simple way to track & maintain package and 
+configurations. This script will help you keep track of installation procedures and soon will have a partner 
+script that will help track all configuration file changes.  The end will be the ability rebuild a server 
+automatically from the logs created by these scripts.  Data backup is not a complicated thing but server 
+configuration backup, in my experience is generally lacking.  My goal it to make server configuration just
+another 'data' to backup.  So if the server goes down, setup a fresh copy of the distro, copy the data to the
+new server and ask the server to: 'get --rebuild'.  Is it too much to ask for?  I don't think so.
 
 
 == Quick Start
@@ -29,7 +34,7 @@ Explanation of what this script does:
 
 == Dependancies
 * bash
-* sudo
+* sudo (Only when run as under a user other then root.)
 * dpkg
 * apt
 
