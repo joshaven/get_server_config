@@ -1,24 +1,30 @@
 == Current Status
 This script only currently supports linux distros that use the APT package manager. (Debian, Ubuntu & friends)
 
-This application is incomplete in features but safe to use.  Keep watching my github... I am making regular improvements.
+This application is incomplete in features but safe to use and still helpful.
+Keep watching my github... I am making regular improvements. Any upgrades version will remain compatible.
+
 Major current limitations: 
   script does not manage gems nor remove .deb or gem packages from the lists
-Minor limitations
-  see the TODO file
+Minor limitations:
+  see the TODO file for unimplemented options
 
 
 == Overview
-This script is meant to function at a very low level.  I am purposing kept the requirements a minimum yet provide a consistent
-way to track & maintain package.
+This script is meant to function at a very low level.  I am purposing kept the requirements a minimum yet provide 
+a consistent way to track & maintain package.
 
 
 == Quick Start
-To install get download the script and they type `sudo bash ./get_installer.sh --self_install` see INSTALL for details
-For help on using 'get' please type 'get --help' at the command prompt.
-As an example, to add the ruby package to your system you would issue this command:
-`sudo get ruby`
-Which would add 'ruby' to the /etc/get_server_config/deb.list file and install ruby from your servers apt repo
+Execute script with installer option
+  sudo bash ./get_installer.sh --self_install #see INSTALL for details
+Read the included help info
+  sudo get --help
+Example installation
+  `sudo get ruby`
+Explanation of what this script does:
+  1) Appends /etc/get_server_config/deb.list with 'ruby'
+  2) Installs 'ruby' from your servers apt repo
 
 
 == Dependancies
@@ -26,3 +32,7 @@ Which would add 'ruby' to the /etc/get_server_config/deb.list file and install r
 * sudo
 * dpkg
 * apt
+
+
+== Please Donate
+Please paypal me a buck or two if you appreciate my work: yourtech@gmail.com
