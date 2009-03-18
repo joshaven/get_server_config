@@ -3,12 +3,12 @@ Improvements:
     (through abstraction function & better file schema) instead of multiple files.
   - Add migration of data when running --self_install
   - `get --initialize` > to add all currently installed packages to 'tracked' apps.  This is to make your server more portable...
-  - Add commenting to installs (to track purpose etc)
-    - support default comment as prior comment (in case multiple apps are installed under the same project... like 'setup mail')
+  - Add tagging to installs (to track purpose etc) (ie: mail, rails, etc,)
+    - default tag as prior tag (in case multiple apps are installed under the same project... like 'mail')
   - Add date/times to installed apps
   - Add user for install
-  - Force installs to be ran by a non-root user & use sudo internally when needed except when sudo is not available on the system
-  - Support other options namely: yum, python:easy_install, python:pip
+  - Force installs to be run as a non-root user & use sudo internally when needed except when sudo is not available on the system
+  - Support other package managers namely: yum, python:easy_install, python:pip
   - Support search (ie: `get search ruby`)
     - Interactive options:
       1) ruby - An interpreter of object-oriented scripting language Ruby
@@ -17,9 +17,10 @@ Improvements:
       4) ruby-full - Ruby full installation
       ... through 0
       (C)anccel - (P)revious page - (N)ext page
+  - Add --list to list the content of the tracked packages grouped by installation type and possibly by tags
       
 Ideas:
   New app: "modify" or "mod" > config file tracker.
-  From the console type `modify /etc/postfix/postfix.conf` to backup and edit using the system configured editor.
-  Backs up changes using tar.gz repo or git repo
-  An alternative would be something that automatically watches configs
+  From the console type `mod /etc/postfix/postfix.conf` to backup and edit using the system configured editor.
+  Backs up changes using tgz, git, or other repo
+  An alternative would be something that automatically watches configs which would be cooler but probably more intrusive

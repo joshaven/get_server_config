@@ -37,7 +37,8 @@ Explanation of what this script does:
 * sudo (Only when run as under a user other then root.)
 * dpkg
 * apt
-
+* grep
+* awk
 
 == Please Donate
 Please paypal me a buck or two if you appreciate my work: yourtech@gmail.com
