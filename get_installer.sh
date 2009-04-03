@@ -1,4 +1,8 @@
 #! /bin/bash
+if [ ! -e '/usr/local/bin/get' ]; then
+  echo "Please Install run with --self_install option to install this package"
+  exit
+fi
 
 function init_install_list {
   if [ ! -e /etc/server_config/deb.list ];then
@@ -147,21 +151,20 @@ function check_validity {
 
 function get_self_installer {
   # Ensure path exists and copy this script to the installation folder
-  mkdir -p /etc/get_server_config/bin/
-  cp -f $0 /etc/get_server_config/bin/get
+  sudo mkdir -p /etc/get_server_config/bin/
+  sudo cp -f $0 /etc/get_server_config/bin/get
   # Set script as executable and symlink to a good location
-  chmod +x /etc/get_server_config/bin/*
-  mkdir -p /usr/local/bin
-  ln -sf /etc/get_server_config/bin/get /usr/local/bin/get
+  sudo chmod +x /etc/get_server_config/bin/*
+  sudo mkdir -p /usr/local/bin
+  sudo ln -s /etc/get_server_config/bin/get /usr/local/bin/get
   # Test install
   if [ -e '/usr/local/bin/get' ]
     then echo "> 'get' was installed successfully"
   fi
   # Test path
   
-  if [[ $PATH =~ (^|:)/usr/local/bin($|:) ]]
-  then echo "> 'get' is avilable in roots path."
-  else echo -e "> It appears that '/usr/local/bin' is not part of your path.\n*** Please add '/usr/local/bin' root's path ***"
+  if [[ ! $PATH =~ (^|:)/usr/local/bin($|:) ]]; then
+  echo -e "> It appears that '/usr/local/bin' is not part of your path.\n*** Please add '/usr/local/bin' root's path ***"
   fi
   echo "Enjoy your (get)ting"
 }
@@ -170,7 +173,6 @@ function get_self_installer {
 
 # It may be nice to import .deb packages or build_from source as options from get so that populating the ./deb does not
 # have to be manual 
-
 if [ `whoami` == 'root' ]; then
   init_install_list
   case $@ in

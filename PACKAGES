@@ -5,3 +5,11 @@ Some options for building .deb packages are:
 - checkinstall http://lmgtfy.com/?q=checkinstall
 - dh-make http://lmgtfy.com/?q=dh_make
 
+Example:
+download ruby
+wget ftp://ftp.ruby-lang.org/pub/ruby/1.9/ruby-1.9.1-p0.tar.gz
+tar -zxf ruby-1.9.1-p0.tar.gz
+cd ruby-1.9.1-p0
+./configure --prefix=/usr --enable-pthread
+make
+checkinstall
