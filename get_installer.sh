@@ -1,50 +1,139 @@
 #! /bin/bash
 function init_install_list {
-  mkdir -p /etc/get_server_config/deb
-  touch /etc/get_server_config/deb.list
+  puts "* Ensuring proper file structure in /etc/get_server_config"
+  super_user_do mkdir -p /etc/get_server_config/deb
+  super_user_do touch /etc/get_server_config/deb.list
 
-  mkdir -p /etc/get_server_config/gem
-  touch /etc/get_server_config/gem.list
+  super_user_do mkdir -p /etc/get_server_config/gem
+  super_user_do touch /etc/get_server_config/gem.list
 
-  mkdir -p /etc/get_server_config/bin
+  super_user_do mkdir -p /etc/get_server_config/bin
+  puts "* Ensureing executable location"
+  super_user_do mkdir -p /usr/local/bin
+}
 
-  mkdir -p /usr/local/bin
+function puts {
+  # make echo command expandable to allow verbosity.
+  echo -e "$@"
+}
+
+function display_help {
+  puts "Usage: get [package] "
+  puts "Install applications using apt package manager."
+  puts "Examples:"
+  puts "  get ruby"
+  puts "  get --purge ruby"
+  puts "  get --rebuild"
+  puts
+  puts "Options:"
+  puts "  --purge [package_name]  This will uninstall package and purge config"
+  puts "  --rebuild               Use this option to install any missing applications"
+  puts "  --version               Display version info."
+  puts "  --self_install          Install get to your system"
+  puts "  --self_uninstall        Remove get from path, leave config files intact"
+  puts "  --self_purge            Remove get & config files (Destructive!)"
+  puts
+  puts "Any .deb packages locate in /etc/get_server_config/deb will take precedence over"
+  puts "any apt repositories.  Be sure to use the following naming convention:"
+  puts "package_name-version.deb for any applications in the local repo."
+  puts "Report any bugs to yourtech@gmail.com"
+  puts "If you find this script useful please paypal my email address a buck or two!"
+  puts "                                    -- Joshaven Potter <yourtech@gmail.com> --"
 }
 
 function self_installer {
-  init_install_list
-  # Ensure path exists and copy this script to the installation folder
-  cp -f $0 /etc/get_server_config/bin/get
-  # Set script as executable and symlink to a good location
-  chmod +x /etc/get_server_config/bin/*
-  ln -s /etc/get_server_config/bin/get /usr/local/bin/get
-  # Test install
-  if [ -e '/usr/local/bin/get' ]
-    then echo "> 'get' was installed successfully"
-  fi
-  # Test path
+  self=$0
+  if [ -e /usr/local/bin/get ];then self_uninstaller;fi # Remove executable symlink
+  self_version_migrator                                 # Run version migrations
+  init_install_list                                     # Ensure file structure is built
   
-  if [[ ! $PATH =~ (^|:)/usr/local/bin($|:) ]]; then
-  echo -e "> It appears that '/usr/local/bin' is not part of your path.\n*** Please add '/usr/local/bin' root's path ***"
+  # Ensure path exists and copy this script to the installation folder
+  super_user_do cp -f $self /etc/get_server_config/bin/get
+  
+  # link script into path
+  if [ -e /etc/get_server_config/bin/get ]; then
+    super_user_do ln -s /etc/get_server_config/bin/get /usr/local/bin/get
+  else
+    puts "Could not find '/etc/get_server_config/bin/get'"
+    return 1
   fi
-  echo "Enjoy your (get)ting"
+  
+  # Set script as executable and symlink to a good location
+  if [ -e /usr/local/bin/get ];then
+    super_user_do chmod +x /usr/local/bin/get
+  fi
+  
+  
+  # Test install
+  if [ -e '/usr/local/bin/get' ];then 
+    puts "SUCCESSFULLY installed 'get'."
+  else
+    puts "Could not locate '/usr/local/bin/get'.  Erron in install."
+  fi
+
+  # Test path
+  if [[ ! $PATH =~ (^|:)/usr/local/bin($|:) ]]; then
+    puts -e "> It appears that '/usr/local/bin' is not part of your path.\n*** Please add '/usr/local/bin' root's path ***"
+  else
+    successful=1
+  fi
+  if [ $successful ];then
+    puts "Enjoy your (get)ting.  For help try 'get --help'"
+  else
+    puts "Error installing get"
+  fi
+}
+
+function self_version_migrator {
+  if [ -e /etc/server_config ]; then
+    super_user_do mv /etc/server_config /etc/get_server_config
+  fi
 }
 
 function self_uninstaller {
-  rm /usr/local/get
+  if [ -e /usr/local/bin/get ];then
+    super_user_do rm /usr/local/bin/get
+    if [ $? ];then puts "Successfully destroyed: executable"; fi
+  else
+    echo "No execuatables to remove, already uninstalled."
+  fi
 }
 
 function self_update {
   cd /tmp
   wget http://github.com/joshaven/get_server_config/raw/master/get_installer.sh
-  if [ $? ];then echo "Downloaded updates"; fi
+  if [ $? ];then 
+    puts "Downloaded updates"
+    self_uninstaller # this is needed to remove the exeutable 
+  fi
   sh /tmp/get_installer.sh --self_install
-  if [ $? ];then echo "Updated Successfully"; else echo "Error Installing"; fi
+  if [ $? ];then puts "Updated Successfully"; else puts "Error Installing"; fi
+  rm /tmp/get_installer.sh
 }
 
 function self_purger {
-  rm /usr/local/bin/get
-  rm -r /etc/get_server_config
+  self_uninstaller
+  if [ -e /etc/get_server_config ]; then
+    super_user_do rm -r /etc/get_server_config
+    if [ $? ];then puts "Successfully destroyed: config files"; fi
+  else
+    puts "No config files to delete, already purged."
+  fi
+}
+
+function super_user_do {
+  if [ $(id -u) == 0 ]; then
+    $@
+    puts " - Did: '$@' as root"
+  else
+    if [ $(which sudo) ];then
+      sudo $@
+      puts "  - Did: '$@' through sudo"
+    else
+      puts "This command requires super user privilages, Please log in as root or install sudo and add $(id -un) to sudoers"
+      return 1
+    fi
+  fi
 }
 
 function rebuild_deb {
@@ -53,10 +142,10 @@ function rebuild_deb {
     if [ -n "$package" ]; then  # -n tests to see if the argument is non empty
       installed=$(dpkg --list |grep "^ii  $package "|awk '{ print $2 }')
       if [ "$package" == "$installed" ]; then
-        echo "$package installation confirmed."
+        puts "$package installation confirmed."
       else
-        echo
-        echo "Installing $package..."
+        puts
+        puts "Installing $package..."
         install_packages $package
       fi
     fi
@@ -69,12 +158,12 @@ function install_packages {
     package=${packages[i]}
     installed=$(dpkg --list |grep "^ii  $package "|awk '{ print $2 }')
     if [ "$package" == "$installed" ]; then
-      echo "$package installation confirmed."
+      puts "$package installation confirmed."
     else
       if install_from_local $package; then
-        dpkg --install `ls /etc/get_server_config/deb/$package*.deb`
+        super_user_do dpkg --install `ls /etc/get_server_config/deb/$package*.deb`
       else
-        apt-get install -y $package
+        super_user_do apt-get install -y $package
       fi
     fi
   done
@@ -85,37 +174,13 @@ function install_from_local {
   return $?
 }
 
-function display_help {
-  echo "Usage: get [package] "
-  echo "Install applications using apt package manager."
-  echo "Examples:"
-  echo "  get ruby"
-  echo "  get --purge ruby"
-  echo "  get --rebuild"
-  echo
-  echo "Options:"
-  echo "  --purge [package_name]  This will uninstall package and purge config"
-  echo "  --rebuild               Use this option to install any missing applications"
-  echo "  --version               Display version info."
-  echo "  --self_install          Install get to your system"
-  echo "  --self_uninstall        Remove get from path, leave config files intact"
-  echo "  --self_purge            Remove get & config files (Destructive!)"
-  echo
-  echo "Any .deb packages locate in /etc/get_server_config/deb will take precedence over"
-  echo "any apt repositories.  Be sure to use the following naming convention:"
-  echo "package_name-version.deb for any applications in the local repo."
-  echo "Report any bugs to yourtech@gmail.com"
-  echo "If you have found this script useful please paypal my email address a buck or two!"
-  echo "                                    -- Joshaven Potter <yourtech@gmail.com>"
-}
-
 function purge_package {
   #convert string into an array
   packages=($@) 
   for (( i=0; i<=${#packages[@]}-1; i++ )); do
     ##FIXME need feature
-    echo "This would purge: ${packages[$i]}... if it were written to do so"
-    echo "please manually edit /etc/get_server_config/deb.list"
+    puts "This would purge: ${packages[$i]}... if it were written to do so"
+    puts "please manually edit /etc/get_server_config/deb.list"
   done
 }
 
@@ -125,17 +190,17 @@ function append_deb_install_list {
   for (( i=0; i<=$[${#packages[@]}-1]; i++ )); do
     if ls /etc/get_server_config/deb/|grep "^${packages[$i]}-[0-9].*.deb$";then
       if package_untracked ${packages[$i]} 'deb';then
-        echo "${packages[$i]}" >> /etc/get_server_config/deb.list
+        super_user_do puts "${packages[$i]}" >> /etc/get_server_config/deb.list
       fi
     elif apt-cache search ${packages[$i]}|awk '{print $1}'|grep "^${packages[$i]}$";then
       if package_untracked ${packages[$i]} 'deb'; then
-        echo "${packages[$i]}" >> /etc/get_server_config/deb.list
+        super_user_do puts "${packages[$i]}" >> /etc/get_server_config/deb.list
       fi
     else
-      echo "ERROR::Can not find package >> ${packages[$i]}"
-      echo "If you are installing a custom .deb package copy it to /etc/get_server_config/deb/"
-      echo "be sure to name the .deb package like: name-version.deb (ie. ruby-1.8.2-p72.deb)"
-      echo
+      puts "ERROR::Can not find package >> ${packages[$i]}"
+      puts "If you are installing a custom .deb package copy it to /etc/get_server_config/deb/"
+      puts "be sure to name the .deb package like: name-version.deb (ie. ruby-1.8.2-p72.deb)"
+      puts
       return 1
     fi
   done
@@ -146,17 +211,17 @@ function append_gem_install_list {
   for (( i=0; i<=$[${#packages[@]}-1]; i++ )); do # step through array, i is index a is the entire array
     if ls /etc/get_server_config/gem/|grep "^${packages[$i]}-[0-9].*.gem$";then # if an existing .gem is around
       if package_untracked ${packages[$i]} 'gem';then
-        echo "${packages[$i]}" >> /etc/get_server_config/gem.list
+        super_user_do puts "${packages[$i]}" >> /etc/get_server_config/gem.list
       fi
     elif gem list ${packages[$i]}|awk '{print $1}'|grep "^${packages[$i]}$";then # if package is on a repo
       if package_untracked ${packages[$i]} 'gem'; then
-        echo "${packages[$i]}" >> /etc/get_server_config/gem.list
+        super_user_do puts "${packages[$i]}" >> /etc/get_server_config/gem.list
       fi
     else
-      echo "ERROR::Can not find package >> ${packages[$i]}"
-      echo "If you are installing a custom .gem package copy it to /etc/get_server_config/gem/"
-      echo "be sure to name the .gem package like: name-version.deb (ie. rails-2.2.2.gem)"
-      echo
+      puts "ERROR::Can not find package >> ${packages[$i]}"
+      puts "If you are installing a custom .gem package copy it to /etc/get_server_config/gem/"
+      puts "be sure to name the .gem package like: name-version.deb (ie. rails-2.2.2.gem)"
+      puts
       return 1
     fi
   done
@@ -169,73 +234,51 @@ function package_untracked {
   return 0
 }
 
-function check_validity {
-  echo "locating packages"
-  packages=($@)
-  for (( i=0; i<=$[${#packages[@]}-1]; i++ )); do # step through array, i is index a is the entire array
-    if apt-cache search ruby|awk '{print $1}'|grep "^${packages[$i]}$";then # if package is on an apt repo
-      echo .
-    elif ls /etc/get_server_config/deb/|grep "^${packages[$i]}-[0-9].*.deb$";then #else if an existing .deb is around
-      echo . 
-    else
-      return 1
-    fi
-  done
-}
-
-function super_user_do {
-  if [ $(id -u) == 0 ]; then
-    $@
+##################################################################################################################
+# Main
+# Process:  Allows self installation without further checks. Otherwise if already installed, processessing request
+#           or crying about needing to be installed.
+##################################################################################################################
+if [[ $@ == '--self_install' ]]; then
+  self_installer $0
+else
+  if [ -e '/usr/local/bin/get' ]; then
+    case $@ in
+    '--version')
+      puts "get 0.0.1 (http://github.com/joshaven/get_server_config)"
+      ;;
+    '' | '--help')
+      display_help
+      ;;
+    '--purge*')
+      shift
+      purge_package $@
+      ;;
+    '--rebuild')
+      rebuild_deb
+      #rebuild_gem  #FIXME Need this to work
+      ;;
+    '--gem*')
+      if super_user_do gem install $@;then
+        append_gem_install_list $@
+      fi
+      ;;
+    '--self_install')
+      puts "get is allready installed."
+      ;;
+    '--self_uninstall')
+      self_uninstaller
+      ;;
+    '--self_purge')
+      self_purger
+      ;;
+    *)
+      if append_deb_install_list $@; then install_packages $@; fi
+      ;;
+    esac
   else
-    if [ $(which sudo) ];then
-      sudo $@
-    else
-      echo "This command requires super user privilages, Please log in as root or install sudo and add $(id -un) to sudoers"
-      return 1
-    fi
+    puts
+    puts "NOTICE: get is NOT installed!"
+    puts "** Please Install by running 'sh $0 --self_install' install get"
   fi
-}
-
-
-if [ ! -e '/usr/local/bin/get' ]; then
-  echo "NOTICE: This package is NOT installed!"
-  echo "Please Install run with --self_install option to install this package"
 fi
-
-# It may be nice to import .deb packages or build_from source as options from get so that populating the ./deb does not
-# have to be manual 
-case $@ in
-'--version')
-  echo "get 0.0.1 (http://github.com/joshaven/get_server_config)"
-  ;;
-'^$' | '--help$')
-  super_user_do display_help
-  ;;
-'--purge*')
-  shift
-  super_user_do purge_package $@
-  ;;
-'--rebuild')
-  super_user_do rebuild_deb
-  #rebuild_gem  #FIXME Need this to work
-  ;;
-'--gem*')
-  if super_user_do gem install $@;then
-    super_user_do append_gem_install_list $@
-  fi
-  ;;
-'--self_install')
-  super_user_do self_installer $0
-  ;;
-'--self_uninstall')
-  super_user_do self_uninstaller
-  ;;
-'--self_purge')
-  super_user_do self_purger
-  ;;
-*)
-  if append_deb_install_list $@; then
-    install_packages $@
-  fi
-  ;;
-esac  
