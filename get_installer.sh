@@ -37,9 +37,9 @@ function self_uninstaller {
 function self_update {
   cd /tmp
   wget http://github.com/joshaven/get_server_config/raw/master/get_installer.sh
-  if [ $? == 0 ]; echo "Downloaded updates"; fi
+  if [ $? ];then echo "Downloaded updates"; fi
   sh /tmp/get_installer.sh --self_install
-  if [ $? == 0 ]; echo "Updated Successfully"; else echo "Error Installing"; fi
+  if [ $? ];then echo "Updated Successfully"; else echo "Error Installing"; fi
 }
 
 function self_purger {
