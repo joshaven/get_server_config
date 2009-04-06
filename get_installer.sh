@@ -245,7 +245,7 @@ else
   if [ -e '/usr/local/bin/get' ]; then
     case $@ in
     '--version')
-      puts "get 0.0.1 (http://github.com/joshaven/get_server_config)"
+      puts "get 0.0.2 alpha (http://github.com/joshaven/get_server_config)"
       ;;
     '' | '--help')
       display_help
