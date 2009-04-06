@@ -17,7 +17,11 @@ function puts {
   echo -e "$@"
 }
 
+function display_version_info {
+  puts "get 0.0.2 alpha (http://github.com/joshaven/get_server_config)"
+}
 function display_help {
+  display_version_info
   puts "Usage: get [package] "
   puts "Install applications using apt package manager."
   puts "Examples:"
@@ -32,6 +36,7 @@ function display_help {
   puts "  --self_install          Install get to your system"
   puts "  --self_uninstall        Remove get from path, leave config files intact"
   puts "  --self_purge            Remove get & config files (Destructive!)"
+  puts "  --self_update           Download and Install current version of get"
   puts
   puts "Any .deb packages locate in /etc/get_server_config/deb will take precedence over"
   puts "any apt repositories.  Be sure to use the following naming convention:"
@@ -99,12 +104,25 @@ function self_uninstaller {
   fi
 }
 
-function self_update {
-  cd /tmp
-  wget http://github.com/joshaven/get_server_config/raw/master/get_installer.sh
-  if [ $? ];then 
+function self_updater {
+  if [ -e /tmp/get_installer.sh ];then 
+    rm /tmp/get_installer.sh
+  fi
+  
+  if which wget>/dev/null; then
+    wget -O /tmp/get_installer.sh -- http://github.com/joshaven/get_server_config/raw/master/get_installer.sh
+  elif which curl>/dev/null; then
+    curl -o /tmp/get_installer.sh -- http://github.com/joshaven/get_server_config/raw/master/get_installer.sh
+  else
+    return 1
+  fi
+    
+  if [ -e /tmp/get_installer.sh ];then 
     puts "Downloaded updates"
     self_uninstaller # this is needed to remove the exeutable 
+  else
+    puts "Error Downloading new get."
+    return 1
   fi
   sh /tmp/get_installer.sh --self_install
   if [ $? ];then puts "Updated Successfully"; else puts "Error Installing"; fi
@@ -245,7 +263,7 @@ else
   if [ -e '/usr/local/bin/get' ]; then
     case $@ in
     '--version')
-      puts "get 0.0.2 alpha (http://github.com/joshaven/get_server_config)"
+      display_version_info
       ;;
     '' | '--help')
       display_help
@@ -268,6 +286,9 @@ else
       ;;
     '--self_uninstall')
       self_uninstaller
+      ;;
+    '--self_update')
+      self_updater
       ;;
     '--self_purge')
       self_purger
