@@ -11,7 +11,7 @@ function init_install_list {
   mkdir -p /usr/local/bin
 }
 
-function get_self_installer {
+function self_installer {
   init_install_list
   # Ensure path exists and copy this script to the installation folder
   cp -f $0 /etc/get_server_config/bin/get
@@ -28,6 +28,23 @@ function get_self_installer {
   echo -e "> It appears that '/usr/local/bin' is not part of your path.\n*** Please add '/usr/local/bin' root's path ***"
   fi
   echo "Enjoy your (get)ting"
+}
+
+function self_uninstaller {
+  rm /usr/local/get
+}
+
+function self_update {
+  cd /tmp
+  wget http://github.com/joshaven/get_server_config/raw/master/get_installer.sh
+  if [ $? == 0 ]; echo "Downloaded updates"; fi
+  sh /tmp/get_installer.sh --self_install
+  if [ $? == 0 ]; echo "Updated Successfully"; else echo "Error Installing"; fi
+}
+
+function self_purger {
+  rm /usr/local/bin/get
+  rm -r /etc/get_server_config
 }
 
 function rebuild_deb {
@@ -79,8 +96,10 @@ function display_help {
   echo "Options:"
   echo "  --purge [package_name]  This will uninstall package and purge config"
   echo "  --rebuild               Use this option to install any missing applications"
-  echo "  --self_install               This will install get to your system"
   echo "  --version               Display version info."
+  echo "  --self_install          Install get to your system"
+  echo "  --self_uninstall        Remove get from path, leave config files intact"
+  echo "  --self_purge            Remove get & config files (Destructive!)"
   echo
   echo "Any .deb packages locate in /etc/get_server_config/deb will take precedence over"
   echo "any apt repositories.  Be sure to use the following naming convention:"
@@ -206,7 +225,13 @@ case $@ in
   fi
   ;;
 '--self_install')
-  super_user_do get_self_installer $0
+  super_user_do self_installer $0
+  ;;
+'--self_uninstall')
+  super_user_do self_uninstaller
+  ;;
+'--self_purge')
+  super_user_do self_purger
   ;;
 *)
   if append_deb_install_list $@; then

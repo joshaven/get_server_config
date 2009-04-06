@@ -1,6 +1,6 @@
 Its as easy to install as downloading the installer script and running it:
 wget http://github.com/joshaven/get_server_config/raw/master/get_installer.sh
-. ./get_installer.sh
+sh ./get_installer.sh
 
 
 If you appreciate the work I put into this please paypal me (yourtech@gmail.com) a buck or two...
