@@ -6,7 +6,6 @@ Improvements:
   - Add tagging to installs (to track purpose etc) (ie: mail, rails, etc,)
     - default tag as prior tag (in case multiple apps are installed under the same project... like 'mail')
   - Add date/times to installed apps
-  - Add user for install
   - Force installs to be run as a non-root user & use sudo internally when needed except when sudo is not available on the system
   - Support other package managers namely: yum, python:easy_install, python:pip
   - Support search (ie: `get search ruby`)

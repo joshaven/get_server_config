@@ -1,12 +1,12 @@
 #! /bin/bash
 function init_install_list {
-  if [ ! -e /etc/server_config/deb.list ];then
-      mkdir -p /etc/server_config/deb
-      touch /etc/server_config/deb.list
+  if [ ! -e /etc/get_server_config/deb.list ];then
+      mkdir -p /etc/get_server_config/deb
+      touch /etc/get_server_config/deb.list
   fi
-  if [ ! -e /etc/server_config/gem.list ];then
-      mkdir -p /etc/server_config/gem
-      touch /etc/server_config/gem.list
+  if [ ! -e /etc/get_server_config/gem.list ];then
+      mkdir -p /etc/get_server_config/gem
+      touch /etc/get_server_config/gem.list
   fi
 }
 
@@ -23,7 +23,7 @@ function rebuild_deb {
         install $package
       fi
     fi
-  done < "/etc/server_config/deb.list"
+  done < "/etc/get_server_config/deb.list"
 }
 
 function install {
@@ -35,7 +35,7 @@ function install {
       echo "$package installation confirmed."
     else
       if install_from_local $package; then
-        dpkg --install `ls /etc/server_config/deb/$package*.deb`
+        dpkg --install `ls /etc/get_server_config/deb/$package*.deb`
       else
         apt-get install -y $package
       fi
@@ -44,7 +44,7 @@ function install {
 }
 
 function install_from_local {
-  ls -1 /etc/server_config/deb/$1*.deb > /dev/null 2>&1
+  ls -1 /etc/get_server_config/deb/$1*.deb > /dev/null 2>&1
   return $?
 }
 
@@ -62,7 +62,7 @@ function display_help {
   echo "  --self_install               This will install get to your system"
   echo "  --version               Display version info."
   echo
-  echo "Any .deb packages locate in /etc/server_config/deb will take precedence over"
+  echo "Any .deb packages locate in /etc/get_server_config/deb will take precedence over"
   echo "any apt repositories.  Be sure to use the following naming convention:"
   echo "package_name-version.deb for any applications in the local repo."
   echo "Report any bugs to yourtech@gmail.com"
@@ -76,7 +76,7 @@ function purge_package {
   for (( i=0; i<=${#packages[@]}-1; i++ )); do
     ##FIXME need feature
     echo "This would purge: ${packages[$i]}... if it were written to do so"
-    echo "please manually edit /etc/server_config/deb.list"
+    echo "please manually edit /etc/get_server_config/deb.list"
   done
 }
 
@@ -84,17 +84,17 @@ function append_deb_install_list {
   packages=($@)
   #array of packages
   for (( i=0; i<=$[${#packages[@]}-1]; i++ )); do
-    if ls /etc/server_config/deb/|grep "^${packages[$i]}-[0-9].*.deb$";then
+    if ls /etc/get_server_config/deb/|grep "^${packages[$i]}-[0-9].*.deb$";then
       if package_untracked ${packages[$i]} 'deb';then
-        echo "${packages[$i]}" >> /etc/server_config/deb.list
+        echo "${packages[$i]}" >> /etc/get_server_config/deb.list
       fi
     elif apt-cache search ${packages[$i]}|awk '{print $1}'|grep "^${packages[$i]}$";then
       if package_untracked ${packages[$i]} 'deb'; then
-        echo "${packages[$i]}" >> /etc/server_config/deb.list
+        echo "${packages[$i]}" >> /etc/get_server_config/deb.list
       fi
     else
       echo "ERROR::Can not find package >> ${packages[$i]}"
-      echo "If you are installing a custom .deb package copy it to /etc/server_config/deb/"
+      echo "If you are installing a custom .deb package copy it to /etc/get_server_config/deb/"
       echo "be sure to name the .deb package like: name-version.deb (ie. ruby-1.8.2-p72.deb)"
       echo
       return 1
@@ -105,17 +105,17 @@ function append_deb_install_list {
 function append_gem_install_list {
   packages=($@) #array of packages
   for (( i=0; i<=$[${#packages[@]}-1]; i++ )); do # step through array, i is index a is the entire array
-    if ls /etc/server_config/gem/|grep "^${packages[$i]}-[0-9].*.gem$";then # if an existing .gem is around
+    if ls /etc/get_server_config/gem/|grep "^${packages[$i]}-[0-9].*.gem$";then # if an existing .gem is around
       if package_untracked ${packages[$i]} 'gem';then
-        echo "${packages[$i]}" >> /etc/server_config/gem.list
+        echo "${packages[$i]}" >> /etc/get_server_config/gem.list
       fi
     elif gem list ${packages[$i]}|awk '{print $1}'|grep "^${packages[$i]}$";then # if package is on a repo
       if package_untracked ${packages[$i]} 'gem'; then
-        echo "${packages[$i]}" >> /etc/server_config/gem.list
+        echo "${packages[$i]}" >> /etc/get_server_config/gem.list
       fi
     else
       echo "ERROR::Can not find package >> ${packages[$i]}"
-      echo "If you are installing a custom .gem package copy it to /etc/server_config/gem/"
+      echo "If you are installing a custom .gem package copy it to /etc/get_server_config/gem/"
       echo "be sure to name the .gem package like: name-version.deb (ie. rails-2.2.2.gem)"
       echo
       return 1
@@ -126,7 +126,7 @@ function append_gem_install_list {
 function package_untracked {
   while read package; do
     if [ $1 == $package ];then return 1;fi
-  done < "/etc/server_config/$2.list"
+  done < "/etc/get_server_config/$2.list"
   return 0
 }
 
@@ -136,7 +136,7 @@ function check_validity {
   for (( i=0; i<=$[${#packages[@]}-1]; i++ )); do # step through array, i is index a is the entire array
     if apt-cache search ruby|awk '{print $1}'|grep "^${packages[$i]}$";then # if package is on an apt repo
       echo .
-    elif ls /etc/server_config/deb/|grep "^${packages[$i]}-[0-9].*.deb$";then #else if an existing .deb is around
+    elif ls /etc/get_server_config/deb/|grep "^${packages[$i]}-[0-9].*.deb$";then #else if an existing .deb is around
       echo . 
     else
       return 1

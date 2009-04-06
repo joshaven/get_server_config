@@ -2,7 +2,7 @@
 This script only currently supports linux distros that use the APT package manager. (Debian, Ubuntu & friends)
 
 This application is incomplete in features but safe to use and still helpful.
-Keep watching my github... I am making regular improvements. Any updates will remain compatible with all versions.
+Keep watching my github... Any updates will remain compatible with all versions.
 
 Major current limitations: 
   script does not manage gems nor remove .deb or gem packages from the lists
