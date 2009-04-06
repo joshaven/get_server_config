@@ -1,9 +1,4 @@
 #! /bin/bash
-if [ ! -e '/usr/local/bin/get' ]; then
-  echo "Please Install run with --self_install option to install this package"
-  exit
-fi
-
 function init_install_list {
   if [ ! -e /etc/server_config/deb.list ];then
       mkdir -p /etc/server_config/deb
@@ -40,9 +35,9 @@ function install {
       echo "$package installation confirmed."
     else
       if install_from_local $package; then
-        sudo dpkg --install `ls /etc/server_config/deb/$package*.deb`
+        dpkg --install `ls /etc/server_config/deb/$package*.deb`
       else
-        sudo apt-get install -y $package
+        apt-get install -y $package
       fi
     fi
   done
@@ -139,7 +134,7 @@ function check_validity {
   echo "locating packages"
   packages=($@)
   for (( i=0; i<=$[${#packages[@]}-1]; i++ )); do # step through array, i is index a is the entire array
-    if sudo apt-cache search ruby|awk '{print $1}'|grep "^${packages[$i]}$";then # if package is on an apt repo
+    if apt-cache search ruby|awk '{print $1}'|grep "^${packages[$i]}$";then # if package is on an apt repo
       echo .
     elif ls /etc/server_config/deb/|grep "^${packages[$i]}-[0-9].*.deb$";then #else if an existing .deb is around
       echo . 
@@ -151,12 +146,12 @@ function check_validity {
 
 function get_self_installer {
   # Ensure path exists and copy this script to the installation folder
-  sudo mkdir -p /etc/get_server_config/bin/
-  sudo cp -f $0 /etc/get_server_config/bin/get
+  mkdir -p /etc/get_server_config/bin/
+  cp -f $0 /etc/get_server_config/bin/get
   # Set script as executable and symlink to a good location
-  sudo chmod +x /etc/get_server_config/bin/*
-  sudo mkdir -p /usr/local/bin
-  sudo ln -s /etc/get_server_config/bin/get /usr/local/bin/get
+  chmod +x /etc/get_server_config/bin/*
+  mkdir -p /usr/local/bin
+  ln -s /etc/get_server_config/bin/get /usr/local/bin/get
   # Test install
   if [ -e '/usr/local/bin/get' ]
     then echo "> 'get' was installed successfully"
@@ -169,41 +164,54 @@ function get_self_installer {
   echo "Enjoy your (get)ting"
 }
 
+function super_user_do {
+  if [ $(id -u) == 0 ]; then
+    $@
+  else
+    if [ $(which sudo) ];then
+      sudo $@
+    else
+      echo "This command requires super user privilages, Please log in as root or install sudo and add $(id -un) to sudoers"
+      return 1
+    fi
+  fi
+}
 
+
+if [ ! -e '/usr/local/bin/get' ]; then
+  echo "NOTICE: This package is NOT installed!"
+  echo "Please Install run with --self_install option to install this package"
+fi
 
 # It may be nice to import .deb packages or build_from source as options from get so that populating the ./deb does not
 # have to be manual 
-if [ `whoami` == 'root' ]; then
-  init_install_list
-  case $@ in
-  '--version')
-    echo "get 0.0.1 (http://github.com/joshaven/get_server_config)"
-    ;;
-  '^$' | '--help$')
-    display_help
-    ;;
-  '--purge*')
-    shift
-    purge_package $@
-    ;;
-  '--rebuild')
-    rebuild_deb
-    #rebuild_gem  #FIXME Need this to work
-    ;;
-  '--gem*')
-    if sudo gem install $@;then
-      append_gem_install_list $@
-    fi
-    ;;
-  '--self_install')
-    get_self_installer $0
-    ;;
-  *)
-    if append_deb_install_list $@; then
-      install $@
-    fi
-    ;;
-  esac  
-else
-  echo "this command requires root access please run 'sudo get package_name'"
-fi
+init_install_list
+case $@ in
+'--version')
+  echo "get 0.0.1 (http://github.com/joshaven/get_server_config)"
+  ;;
+'^$' | '--help$')
+  super_user_do display_help
+  ;;
+'--purge*')
+  shift
+  super_user_do purge_package $@
+  ;;
+'--rebuild')
+  super_user_do rebuild_deb
+  #rebuild_gem  #FIXME Need this to work
+  ;;
+'--gem*')
+  if super_user_do gem install $@;then
+    super_user_do append_gem_install_list $@
+  fi
+  ;;
+'--self_install')
+  super_user_do get_self_installer $0
+  ;;
+*)
+  if append_deb_install_list $@; then
+    install $@
+  fi
+  ;;
+esac  
