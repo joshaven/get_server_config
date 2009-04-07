@@ -1,4 +1,7 @@
 #! /bin/bash
+# FIXME some super_user_do requests act oddly upon the params... test that 'super_user_do something >> somewhere' works 
+#   even when failure to get super user happens...
+
 function init_install_list {
   puts "* Ensuring proper file structure in /etc/get_server_config"
   super_user_do mkdir -p /etc/get_server_config/deb
@@ -20,6 +23,7 @@ function puts {
 function display_version_info {
   puts "get 0.0.2 alpha (http://github.com/joshaven/get_server_config)"
 }
+
 function display_help {
   display_version_info
   puts "Usage: get [package] "
@@ -142,11 +146,9 @@ function self_purger {
 function super_user_do {
   if [ $(id -u) == 0 ]; then
     $@
-    puts " - Did: '$@' as root"
   else
     if [ $(which sudo) ];then
       sudo $@
-      puts "  - Did: '$@' through sudo"
     else
       puts "This command requires super user privilages, Please log in as root or install sudo and add $(id -un) to sudoers"
       return 1
@@ -206,13 +208,13 @@ function append_deb_install_list {
   packages=($@)
   #array of packages
   for (( i=0; i<=$[${#packages[@]}-1]; i++ )); do
-    if ls /etc/get_server_config/deb/|grep "^${packages[$i]}-[0-9].*.deb$";then
+    if ls /etc/get_server_config/deb/|grep "^${packages[$i]}-[0-9].*.deb$";then # if .deb is found in /deb folder
       if package_untracked ${packages[$i]} 'deb';then
         super_user_do puts "${packages[$i]}" >> /etc/get_server_config/deb.list
       fi
-    elif apt-cache search ${packages[$i]}|awk '{print $1}'|grep "^${packages[$i]}$";then
-      if package_untracked ${packages[$i]} 'deb'; then
-        super_user_do puts "${packages[$i]}" >> /etc/get_server_config/deb.list
+    elif apt-cache search ${packages[$i]}|awk '{print $1}'|grep "^${packages[$i]}$";then # else if package is in repo
+      if package_untracked ${packages[$i]} 'deb';then
+        super_user_do puts "${packages[$i]}" >> /etc/get_server_config/deb.list --quiet
       fi
     else
       puts "ERROR::Can not find package >> ${packages[$i]}"
