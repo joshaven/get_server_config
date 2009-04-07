@@ -21,6 +21,10 @@ new server and ask the server to: 'get --rebuild'.  Is it too much to ask for?  
 
 
 == Quick Start
+Install on server from the Internet:
+  wget http://github.com/joshaven/get_server_config/raw/master/get_installer.sh
+  sh ./get_installer.sh --self_install
+  rm get_installer.sh
 Execute script with installer option
   sudo bash ./get_installer.sh --self_install #see INSTALL for details
 Read the included help info
@@ -39,6 +43,7 @@ Explanation of what this script does:
 * apt
 * grep
 * awk
+* wget or curl (Only for self_update feature)
 
 == Please Donate
 Please paypal me a buck or two if you appreciate my work: yourtech@gmail.com

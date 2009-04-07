@@ -1,7 +1,9 @@
 Its as easy to install as downloading the installer script and running it:
 wget http://github.com/joshaven/get_server_config/raw/master/get_installer.sh
-sh ./get_installer.sh
+sh ./get_installer.sh --self_install
+rm get_installer.sh
 
+Alternatively, you could do a git clone and run the script from there... but why?
 
 If you appreciate the work I put into this please paypal me (yourtech@gmail.com) a buck or two...
 
