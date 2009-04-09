@@ -214,7 +214,7 @@ function append_deb_install_list {
       fi
     elif apt-cache search ${packages[$i]}|awk '{print $1}'|grep "^${packages[$i]}$";then # else if package is in repo
       if package_untracked ${packages[$i]} 'deb';then
-        super_user_do puts "${packages[$i]}" >> /etc/get_server_config/deb.list --quiet
+        super_user_do puts "${packages[$i]}" >> /etc/get_server_config/deb.list
       fi
     else
       puts "ERROR::Can not find package >> ${packages[$i]}"
