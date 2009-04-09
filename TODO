@@ -23,3 +23,6 @@ Ideas:
   From the console type `mod /etc/postfix/postfix.conf` to backup and edit using the system configured editor.
   Backs up changes using tgz, git, or other repo
   An alternative would be something that automatically watches configs which would be cooler but probably more intrusive
+  
+FIXME'S:
+  - Ignore un-processable lines in package.list files > permit commenting and avoid any errors that can come from notations
