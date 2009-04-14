@@ -36,18 +36,18 @@ function permissions_to_octal {
 
 function best_speed {
   MOUNT=$1
-  i=128
+  size=128
   # loop from i to less then 524288 doubleing i each loop... ie: (128,256..131072,262144)
-  while [ $i -lt 524288 ]; do
+  while [ $size -lt 524288 ]; do
     echo "########################################################"
-    mount $MOUNT /mnt/ -o rw,wsize=$size
+    mount $MOUNT /mnt -o rw,wsize=$size
     time dd if=/dev/zero of=/mnt/test bs=16k count=16k
     echo "with a size of: $size"
     umount /mnt
     echo "########################################################"
     echo
     echo
-    i=$[$i*2]
+    size=$[$size*2]
   done
 }
 
