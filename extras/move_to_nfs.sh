@@ -16,11 +16,19 @@ function move_to_nfs {
   chown $MOUNTUSER $MOUNT
   chgrp $MOUNTGROUP $MOUNT
   chmod $MOUNTPERMISSIONS $MOUNT
+  which ssh; if [ $? = 0 ];then 
+    ssh $NFSSERVER "mkdir -p /nfs/$VMNAME$MOUNT"
+    if [ $? -ne 0 ];then return 2;fi
+  fi
   echo "$NFSSERVER:/nfs/$VMNAME$MOUNT $MOUNT nfs rw,rsize=$PACKETSIZE,wsize=$PACKETSIZE,hard,intr,async,nodev,nosuid 0 0" >> /etc/fstab
   mount $MOUNT
-  mv /tmp$MOUNT/* $MOUNT/
-  rm -r /tmp$MOUNT
-  return 0
+  if [ $? -eq 0 ];then 
+    mv /tmp$MOUNT/* $MOUNT/
+    rm -r /tmp$MOUNT
+    return 0
+  else
+    return 2
+  fi
 }
 
 function permissions_to_octal {
@@ -43,6 +51,7 @@ function best_speed {
     mount $MOUNT /mnt -o rw,wsize=$size
     time dd if=/dev/zero of=/mnt/test bs=16k count=16k
     echo "with a size of: $size"
+    rm /mnt/test
     umount /mnt
     echo "########################################################"
     echo
