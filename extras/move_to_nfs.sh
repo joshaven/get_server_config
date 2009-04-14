@@ -21,14 +21,12 @@ function move_to_nfs {
     if [ $? -ne 0 ];then return 2;fi
   fi
   echo "$NFSSERVER:/nfs/$VMNAME$MOUNT $MOUNT nfs rw,rsize=$PACKETSIZE,wsize=$PACKETSIZE,hard,intr,async,nodev,nosuid 0 0" >> /etc/fstab
+  # mount nfs ## handel failures 
   mount $MOUNT
-  if [ $? -eq 0 ];then 
-    mv /tmp$MOUNT/* $MOUNT/
-    rm -r /tmp$MOUNT
-    return 0
-  else
-    return 2
-  fi
+  # Move data back to original location... which should hopefully be on the new nfs mount... otherwise it will still be on the fs
+  mv /tmp$MOUNT/* $MOUNT/
+  rm -r /tmp$MOUNT
+  return 0
 }
 
 function permissions_to_octal {
