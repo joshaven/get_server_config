@@ -1,7 +1,9 @@
 function move_to_nfs {
   # Usage 
   # ie:  to_nfs /home 10.22.88.200 vm1
-  if [ $# < 3 ]; then; return 2; fi
+  if [ $# -ne 3 ]; then 
+    return 2
+  fi
   MOUNT=$1
   PACKETSIZE=131072
   NFSSERVER=$2
@@ -18,6 +20,7 @@ function move_to_nfs {
   mount $MOUNT
   mv /tmp$MOUNT/* $MOUNT/
   rm -r /tmp$MOUNT
+  return 0
 }
 
 function permissions_to_octal {
@@ -48,35 +51,31 @@ function best_speed {
   done
 }
 
-function display_version_info { echo "Pre-Alpha 0.0.0 - Unstable" }
+function display_version_info {
+  echo "Pre-Alpha 0.0.0 - Unstable"
+}
 
-function display_help { echo "--speed_test 10.22.88.200:/nfs/vm2  *WARNING... this takes a while to run, be patient*" }
+function display_help {
+  echo "Usage ie:  $0 /home 10.22.88.200 vm1"
+  echo "--speed_test 10.22.88.200:/nfs/vm2  WARNING... this takes a while to run"
+}
 
-
-
-if [[ $@ == '--self_install' ]]; then
-  self_installer $0
-else
-  if [ -e '/usr/local/bin/get' ]; then
-    case $@ in
-    '--version')
-      display_version_info
-      ;;
-    '' | '--help')
-      display_help
-      ;;
-    *)
-      if [ $# = 3 ]; then
-        move_to_nfs $@
-      else
-        display_help
-        return 2
-      fi
-      ;;
-    esac
+case $@ in
+--version)
+  display_version_info
+  ;;
+'' | --help)
+  display_help
+  ;;
+--speed_test*)
+  shift
+  best_speed $@
+  ;;
+*)
+  if [ $# = 3 ]; then
+    move_to_nfs $@
   else
-    puts
-    puts "NOTICE: get is NOT installed!"
-    puts "** Please Install by running 'sh $0 --self_install' install get"
+    display_help
   fi
-fi
+  ;;
+esac
