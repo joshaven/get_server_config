@@ -7,7 +7,7 @@ function move_to_nfs {
   VMNAME=$3
   MOUNTUSER=$(ls -ld $MOUNT|awk '{print $3}')
   MOUNTGROUP=$(ls -ld $MOUNT|awk '{print $4}')
-  MOUNTPERMISSIONS=$(octal_permissions `ls -ld $MOUNT`)
+  MOUNTPERMISSIONS=$(permissions_to_octal `ls -ld $MOUNT`)
   sudo mv $MOUNT /tmp
   sudo mkdir $MOUNT
   sudo chown $MOUNTUSER $MOUNT
@@ -19,7 +19,7 @@ function move_to_nfs {
   sudo rm "/tmp/$MOUNT"
 }
 
-function octal_permissions {
+function permissions_to_octal {
   # expects text like: drwxr-xr-x 2 joshaven joshaven 4096 2009-04-13 17:21
   # The output of `ls -ld` is great!
   echo $@ | sed 's/.\(.........\).*/\1/
@@ -47,6 +47,33 @@ function best_speed {
   done
 }
 
-move_to_nfs $@
+function display_version_info { echo "Pre-Alpha 0.0.0 - Unstable" }
 
-echo "--speed_test 10.22.88.200:/nfs/vm2  *WARNING... this takes a while to run, be patient, have a drink*"
+function display_help { echo "--speed_test 10.22.88.200:/nfs/vm2  *WARNING... this takes a while to run, be patient*" }
+
+
+if [[ $@ == '--self_install' ]]; then
+  self_installer $0
+else
+  if [ -e '/usr/local/bin/get' ]; then
+    case $@ in
+    '--version')
+      display_version_info
+      ;;
+    '' | '--help')
+      display_help
+      ;;
+    *)
+      if [ $# = 3 ]; then
+        move_to_nfs $@
+      else
+        display_help
+      fi
+      ;;
+    esac
+  else
+    puts
+    puts "NOTICE: get is NOT installed!"
+    puts "** Please Install by running 'sh $0 --self_install' install get"
+  fi
+fi
