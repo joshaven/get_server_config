@@ -1,0 +1,7 @@
+Everything in this folder is in currently in a pre-alpha stage
+
+Use and explore at your own risk... I do NOT recommend trying on a production system at this point.
+These scripts are designed around my environment.  I will be abstracting these functions some day God 
+willing.  I also if and when these 'extras' are stable they will be installable via 'get'.  I intend 
+all of my useful server management & setup functions to be installable via get.  Maybe one day I'll 
+have a nice collection of server administration features to be an equivalent of something like Webmin. 

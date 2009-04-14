@@ -1,8 +1,8 @@
 == Current Status
 This script only currently supports linux distros that use the APT package manager. (Debian, Ubuntu & friends)
 
-This application is incomplete in features but safe to use and still helpful.
-Keep watching my github... Any updates will remain compatible with all versions.
+The 'get' application is incomplete in features but safe to use and still helpful.
+Keep watching my github... Any updates to 'get' will remain compatible with all versions.
 
 Major current limitations: 
   script does not manage gems nor remove .deb or gem packages from the lists
@@ -19,6 +19,13 @@ configuration backup, in my experience is generally lacking.  My goal it to make
 another 'data' to backup.  So if the server goes down, setup a fresh copy of the distro, copy the data to the
 new server and ask the server to: 'get --rebuild'.  Is it too much to ask for?  I don't think so.
 
+== NOTICE
+This project includes multiple scripts that are under development.  Be sure to read any local README files.  
+This README only applies specifically to files in this folder.
+
+== WARNING
+Use at your own risk, I do not accepting any liability of any sort.  This project and all of its files are
+freely made available for the betterment of the Unix, BSD & Linux environments.
 
 == Quick Start
 Install on server from the Internet:
