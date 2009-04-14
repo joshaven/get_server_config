@@ -1,10 +1,10 @@
 # hash object
 function Hash {
-  if [[ -n $3 ]]; then # three or more param: assignment
-    export "hash_${1}_${2}"=$3
-  elif [[ -n $2 ]]; then # two params: inquiry
+  if [ $# = 3 ]; then # three or more param: assignment
+    export "hash_${1}_${2}=\$3"
+  elif [ $# = 2 ]; then # two params: inquiry
     echo "$(eval echo \$hash_${1}_${2})"
-  elif [[ -n $1 ]]; then # one param: create a hash instance
+  elif [ $# = 1 ]; then # one param: create a hash instance
     eval "function ${1} { Hash $1 \$@; }";
   else
     echo "Usage:"
@@ -16,12 +16,12 @@ function Hash {
 }
 
 function Array {
-  if [[ -n $2 ]]; then # two or more params: assignment (ie: Array tests 123 45 6)
+  if [ $# = 2 ]; then # two or more params: assignment (ie: Array tests 123 45 6)
     arg=$1;shift
     params=$@
     echo params:${params[@]}
     export "array_${arg}"=${params[@]};fi;};Array me one two
-  elif [[ -n $1 ]]; then # one params: Array inquiry (ie: Array tests OR Array instantiation)
+  elif [ $# = 1 ]; then # one params: Array inquiry (ie: Array tests OR Array instantiation)
     if [ "\$array_$1" ] # if var exists then give it
       echo "$(eval echo \${array_$1[@]})"
     else # else make the instantize the Array
