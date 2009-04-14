@@ -9,15 +9,15 @@ function move_to_nfs {
   MOUNTUSER=$(ls -ld $MOUNT|awk '{print $3}')
   MOUNTGROUP=$(ls -ld $MOUNT|awk '{print $4}')
   MOUNTPERMISSIONS=$(permissions_to_octal `ls -ld $MOUNT`)
-  sudo mv $MOUNT /tmp
-  sudo mkdir $MOUNT
-  sudo chown $MOUNTUSER $MOUNT
-  sudo chgroup $MOUNTGROUP $MOUNT
-  sudo chmod $MOUNTPERMISSIONS $MOUNT
-  sudo echo "$NFSSERVER:/nfs/$VMNAME/$MOUNT /$MOUNT nfs rw,rsize=$PACKETSIZE,wsize=$PACKETSIZE,hard,intr,async,nodev,nosuid 0 0" >> /etc/fstab
-  sudo mount
-  sudo mv -r "/tmp/$MOUNT/* $MOUNT/"
-  sudo rm "/tmp/$MOUNT"
+  mv $MOUNT /tmp
+  mkdir $MOUNT
+  chown $MOUNTUSER $MOUNT
+  chgrp $MOUNTGROUP $MOUNT
+  chmod $MOUNTPERMISSIONS $MOUNT
+  echo "$NFSSERVER:/nfs/$VMNAME$MOUNT $MOUNT nfs rw,rsize=$PACKETSIZE,wsize=$PACKETSIZE,hard,intr,async,nodev,nosuid 0 0" >> /etc/fstab
+  mount $MOUNT
+  mv /tmp$MOUNT/* $MOUNT/
+  rm -r /tmp$MOUNT
 }
 
 function permissions_to_octal {
@@ -51,6 +51,7 @@ function best_speed {
 function display_version_info { echo "Pre-Alpha 0.0.0 - Unstable" }
 
 function display_help { echo "--speed_test 10.22.88.200:/nfs/vm2  *WARNING... this takes a while to run, be patient*" }
+
 
 
 if [[ $@ == '--self_install' ]]; then
