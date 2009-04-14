@@ -296,7 +296,11 @@ else
       self_purger
       ;;
     *)
-      if append_deb_install_list $@; then install_packages $@; fi
+      if append_deb_install_list $@; then 
+        install_packages $@
+      else
+        return 2
+      fi
       ;;
     esac
   else

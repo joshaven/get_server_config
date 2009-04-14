@@ -1,6 +1,7 @@
 function move_to_nfs {
   # Usage 
   # ie:  to_nfs /home 10.22.88.200 vm1
+  if [ $# < 3 ]; then; return 2; fi
   MOUNT=$1
   PACKETSIZE=131072
   NFSSERVER=$2
@@ -68,6 +69,7 @@ else
         move_to_nfs $@
       else
         display_help
+        return 2
       fi
       ;;
     esac
